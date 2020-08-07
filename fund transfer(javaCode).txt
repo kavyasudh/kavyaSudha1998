@@ -13,9 +13,12 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.Font;
 import javax.swing.SwingConstants;
+
+import com.mysql.cj.jdbc.CallableStatement;
+
 import java.awt.Color;
 
-public class transac1 {
+public class transac{
 	
 
 	private JFrame frame;
@@ -27,7 +30,7 @@ public class transac1 {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					transac1 window = new transac1();
+					transac window = new transac();
 					window.frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -40,7 +43,7 @@ public class transac1 {
 	/**
 	 * Create the application.
 	 */
-	public transac1() {
+	public transac() {
 		initialize();
 	}
 
@@ -61,6 +64,7 @@ public class transac1 {
 				
 				Connection myConn=null;
 				Statement Stat=null;
+				CallableStatement mystat=null;
 				try {
 					//String driver="com.mysql.jdbc.Driver";
 				    String dbUrl="jdbc:mysql://localhost:3306/transacdb";
@@ -79,19 +83,32 @@ public class transac1 {
 				        	System.out.println("TRANSACTION"+":"+""+rs1.getInt("tid")+"  "+"acc no"+":"+rs1.getInt("acc_no")+"  "+"bal"+":"+rs1.getDouble("bal")+"  "+"trans amnt"+":"+rs1.getDouble("t_amnt")+"  "+"rem bal"+":"+rs1.getDouble("r_bal"));
 						}
 				        break;
-				case 2:
+                case 2:
+					
+					mystat=(CallableStatement) myConn.prepareCall("{Call update_trans()}");
+					
+					mystat.execute();
+					
 					 		                ResultSet rs2 = Stat.executeQuery(
-								"select tid,acc_no,bal,t_amnt,r_bal from acc");
+								"select t_amnt from acc");
 				        while (rs2.next()) { 
 				        	System.out.println("\n");
-				        	System.out.println("TRANSACTION"+":"+""+rs2.getInt("tid")+"  "+"acc no"+":"+rs2.getInt("acc_no")+"  "+"bal"+":"+rs2.getDouble("bal")+"  "+"trans amnt"+":"+rs2.getDouble("t_amnt")+"  "+"rem bal"+":"+rs2.getDouble("r_bal"));
+				        	System.out.println("Fund Transfered"+":" +""+rs2.getDouble("t_amnt"));
 						}
 				        
 					break;
+
 				case 3:
+					
+                   mystat=(CallableStatement) myConn.prepareCall("{Call updated_log()}");
+					
+					mystat.execute();
+					
+
 					ResultSet rs3 = Stat.executeQuery("select tid,acc_no,bal,t_amnt,r_bal from acc");
 					 while (rs3.next()) { 
 						 System.out.println("\n");
+						 System.out.println("updated transaction details:");
 						 System.out.println("TRANSACTION"+":"+""+rs3.getInt("tid")+"  "+"acc no"+":"+rs3.getInt("acc_no")+"  "+"bal"+":"+rs3.getDouble("bal")+"  "+"trans amnt"+":"+rs3.getDouble("t_amnt")+"  "+"rem bal"+":"+rs3.getDouble("r_bal"));
 						}
 				        
@@ -134,3 +151,4 @@ public class transac1 {
 	}
 
 }
+
